@@ -99,12 +99,12 @@ videoRouter.post('/', (req: Request, res: Response) => {
             field: ""
         }
     }
-    if (!(req.body.title.length < 41 && typeof(req.body.title) === 'string')) {
+    if (!req.body.title || !(req.body.title.length < 41) || !(typeof(req.body.title) === 'string')) {
         apiErrorResult.errorsMessages.message = "Please type title with maximum length 40";
         apiErrorResult.errorsMessages.field = "title";
         res.status(400).send(apiErrorResult);
         return;
-    } else if (!(req.body.author.length < 21)) {
+    } else if (!req.body.author || !(req.body.author.length < 21)) {
         apiErrorResult.errorsMessages.message = "Please type author with maximum length 20";
         apiErrorResult.errorsMessages.field = "author";
         res.status(400).send(apiErrorResult);
