@@ -1,10 +1,14 @@
 import express, {Request, Response} from "express";
 import bodyParser from "body-parser";
-import {videoRouter} from "./router/video-router";
+import {videoRouter} from "./routes/video-router";
 
 const app = express();
 const port = process.env.PORT || 5000;
 const parserMiddleWare = bodyParser();
+
+app.get('/', (req:Request, res:Response) => {
+    res.send('Hello World!')
+})
 
 // Middleware
 app.use(parserMiddleWare); // -- bodyParser
