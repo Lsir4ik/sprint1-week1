@@ -133,7 +133,7 @@ videoRouter.post('/', (req: Request, res: Response) => {
             })
     }
     if (apiErrorResult.errorsMessages.length > 0) {
-        res.status(400).send(apiErrorResult);
+        res.status(400).send(JSON.stringify(apiErrorResult));
         return;
     } else {
         let dateForId = new Date()
