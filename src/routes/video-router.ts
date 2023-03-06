@@ -42,42 +42,52 @@ videoRouter.get('/:id', (req: Request, res: Response) => {
 videoRouter.put('/:id', (req: Request, res: Response) => {
     let video = videos.find(el => el.id === +req.params.id);
     if (video) {
-        const apiErrorResult = {
-            errorsMessages: [
-                {
-                    message: "",
-                    field: ""
-                }
-            ]
+        const apiErrorResult: { errorsMessages: Array<object> } = {
+            errorsMessages: []
         }
         if (!(req.body.title.length < 41 && typeof (req.body.title) === 'string')) {
-            apiErrorResult.errorsMessages[0].message = "Please type title with maximum length 40";
-            apiErrorResult.errorsMessages[0].field = "title";
-            res.status(400).send(apiErrorResult);
-            return;
-        } else if (!(req.body.author.length < 21)) {
-            apiErrorResult.errorsMessages[0].message = "Please type author with maximum length 20";
-            apiErrorResult.errorsMessages[0].field = "author";
-            res.status(400).send(apiErrorResult);
-            return;
-        } else if (!contains(resolutions, req.body.availableResolutions)) {
-            apiErrorResult.errorsMessages[0].message = "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)";
-            apiErrorResult.errorsMessages[0].field = "availableResolutions";
-            res.status(400).send(apiErrorResult);
-            return;
-        } else if (!(typeof (req.body.canBeDownloaded) === "boolean")) {
-            apiErrorResult.errorsMessages[0].message = "A field 'canBeDownloaded' should be boolean value";
-            apiErrorResult.errorsMessages[0].field = "canBeDownloaded";
-            res.status(400).send(apiErrorResult);
-            return;
-        } else if (!(+req.body.minAgeRestriction < 19 && +req.body.minAgeRestriction > 0)) {
-            apiErrorResult.errorsMessages[0].message = "Restriction age should be in [1, 18]";
-            apiErrorResult.errorsMessages[0].field = "minAgeRestriction";
-            res.status(400).send(apiErrorResult);
-            return;
-        } else if (!req.body.publicationDate) {
-            apiErrorResult.errorsMessages[0].message = "Please type correct publication date";
-            apiErrorResult.errorsMessages[0].field = "publicationDate";
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "Please type correct title",
+                    field: "title"
+                })
+        }
+        if (!(req.body.author.length < 21)) {
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "Please type correct author",
+                    field: "author"
+                })
+        }
+        if (!contains(resolutions, req.body.availableResolutions)) {
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)",
+                    field: "availableResolutions"
+                })
+        }
+        if (!(typeof (req.body.canBeDownloaded) === "boolean")) {
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "A field 'canBeDownloaded' should be boolean value",
+                    field: "canBeDownloaded"
+                })
+        }
+        if (!(+req.body.minAgeRestriction < 19 && +req.body.minAgeRestriction > 0)) {
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "Restriction age should be in [1, 18]",
+                    field: "minAgeRestriction"
+                })
+        }
+        if (!req.body.publicationDate) {
+            apiErrorResult.errorsMessages.push(
+                {
+                    message: "Please type correct publication date",
+                    field: "publicationDate"
+                })
+        }
+        if (apiErrorResult.errorsMessages.length > 0) {
             res.status(400).send(apiErrorResult);
             return;
         } else {
@@ -95,27 +105,31 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
 });
 // POST
 videoRouter.post('/', (req: Request, res: Response) => {
-    const apiErrorResult = {
-        errorsMessages: [
-            {
-                message: "",
-                field: ""
-            }
-        ]
+    const apiErrorResult: { errorsMessages: Array<object> } = {
+        errorsMessages: []
     }
     if (!req.body.title || !(req.body.title.length < 41) || !(typeof (req.body.title) === 'string')) {
-        apiErrorResult.errorsMessages[0].message = "Please type title with maximum length 40";
-        apiErrorResult.errorsMessages[0].field = "title";
-        res.status(400).send(apiErrorResult);
-        return;
-    } else if (!req.body.author || !(req.body.author.length < 21)) {
-        apiErrorResult.errorsMessages[0].message = "Please type author with maximum length 20";
-        apiErrorResult.errorsMessages[0].field = "author";
-        res.status(400).send(apiErrorResult);
-        return;
-    } else if (!contains(resolutions, req.body.availableResolutions)) {
-        apiErrorResult.errorsMessages[0].message = "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)";
-        apiErrorResult.errorsMessages[0].field = "availableResolutions";
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Please type correct title",
+                field: "title"
+            })
+    }
+    if (!req.body.author || !(req.body.author.length < 21)) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Please type correct author",
+                field: "author"
+            })
+    }
+    if (!contains(resolutions, req.body.availableResolutions)) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)",
+                field: "availableResolutions"
+            })
+    }
+    if (apiErrorResult.errorsMessages.length > 0) {
         res.status(400).send(apiErrorResult);
         return;
     } else {
@@ -135,7 +149,7 @@ videoRouter.post('/', (req: Request, res: Response) => {
         videos.push(newVideo);
         res.status(201).send(newVideo);
     }
-});
+})
 // DELETE
 videoRouter.delete('/:id', (req: Request, res: Response) => {
     for (let i = 0; i < videos.length; i++) {
@@ -147,4 +161,4 @@ videoRouter.delete('/:id', (req: Request, res: Response) => {
             res.sendStatus(404);
         }
     }
-});
+})
