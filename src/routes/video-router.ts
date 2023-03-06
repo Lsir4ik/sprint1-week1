@@ -45,14 +45,14 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
         const apiErrorResult: { errorsMessages: Array<object> } = {
             errorsMessages: []
         }
-        if (!(req.body.title.length < 41 && typeof (req.body.title) === 'string')) {
+        if (!req.body.title || !(req.body.title.length < 41) || !(typeof (req.body.title) === 'string')) {
             apiErrorResult.errorsMessages.push(
                 {
                     message: "Please type correct title",
                     field: "title"
                 })
         }
-        if (!(req.body.author.length < 21)) {
+        if (!req.body.author || !(req.body.author.length < 21)) {
             apiErrorResult.errorsMessages.push(
                 {
                     message: "Please type correct author",
