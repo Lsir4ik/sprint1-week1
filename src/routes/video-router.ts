@@ -116,6 +116,8 @@ videoRouter.post('/', (req: Request, res: Response) => {
         return;
     } else {
         let date = new Date()
+        let date1 = new Date()
+        date1.setDate(date.getDate() + 1)
         const newVideo: Video = {
             id: +date,
             title: req.body.title,
@@ -123,7 +125,7 @@ videoRouter.post('/', (req: Request, res: Response) => {
             canBeDownloaded: false,
             minAgeRestriction: null,
             createdAt: date.toISOString(),
-            publicationDate: date.setDate(date.getDate() + 1).toString(),
+            publicationDate: date1.toISOString(),
             availableResolutions: req.body.availableResolutions
         }
         videos.push(newVideo);
