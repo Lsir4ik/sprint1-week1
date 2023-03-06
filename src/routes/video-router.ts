@@ -48,7 +48,7 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
                 field: ""
             }
         }
-        if (!(req.body.title.length < 41)) {
+        if (!(req.body.title.length < 41 && typeof(req.body.title) === 'string')) {
             apiErrorResult.errorsMessages.message = "Please type title with maximum length 40";
             apiErrorResult.errorsMessages.field = "title";
             res.status(400).send(apiErrorResult);
@@ -99,7 +99,7 @@ videoRouter.post('/', (req: Request, res: Response) => {
             field: ""
         }
     }
-    if (!(req.body.title.length < 41)) {
+    if (!(req.body.title.length < 41 && typeof(req.body.title) === 'string')) {
         apiErrorResult.errorsMessages.message = "Please type title with maximum length 40";
         apiErrorResult.errorsMessages.field = "title";
         res.status(400).send(apiErrorResult);
@@ -137,10 +137,10 @@ videoRouter.delete('/:id', (req: Request, res: Response) => {
     for (let i = 0; i < videos.length; i++) {
         if (videos[i].id === +req.params.id) {
             videos.splice(i, 1);
-            res.status(204);
+            res.sendStatus(204);
             return;
         } else {
-            res.status(404);
+            res.sendStatus(404);
         }
     }
 });
