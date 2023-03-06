@@ -16,6 +16,7 @@ app.use('/videos', videoRouter); // -- Routing
 
 // Testing delete all data
 app.delete('/testing/all-data', (req:Request, res:Response) => {
+    //TODO delete data
     res.sendStatus(204);
 })
 

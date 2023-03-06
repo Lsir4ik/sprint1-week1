@@ -12,7 +12,7 @@ type Video = {
     availableResolutions: Array<string>
 } // переделать на классах?
 const resolutions: Array<string> = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
-const videos: Array<Video> = [];
+export const videos: Array<Video> = [];
 
 // Routing.
 export const videoRouter = Router();
@@ -24,6 +24,7 @@ function contains(where: Array<string>, what: Array<string>): boolean {
     }
     return true;
 }
+const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 
 // GET
 videoRouter.get('/', (req: Request, res: Response) => {
@@ -40,65 +41,67 @@ videoRouter.get('/:id', (req: Request, res: Response) => {
 });
 // PUT
 videoRouter.put('/:id', (req: Request, res: Response) => {
+    // Валидация
+    const apiErrorResult: { errorsMessages: Array<object> } = {
+        errorsMessages: []
+    }
+    if (!req.body.title || !(req.body.title.length < 41) || !(typeof (req.body.title) === 'string')) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Please type correct title",
+                field: "title"
+            })
+    }
+    if (!req.body.author || !(req.body.author.length < 21) || !(typeof (req.body.author) === 'string')) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Please type correct author",
+                field: "author"
+            })
+    }
+    if (!req.body.availableResolutions || !contains(resolutions, req.body.availableResolutions)) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)",
+                field: "availableResolutions"
+            })
+    }
+    if (!req.body.canBeDownloaded || !(typeof (req.body.canBeDownloaded) === "boolean")) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "A field 'canBeDownloaded' should be boolean value",
+                field: "canBeDownloaded"
+            })
+    }
+    if (!(+req.body.minAgeRestriction < 19 && +req.body.minAgeRestriction > 0)) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Restriction age should be in [1, 18]",
+                field: "minAgeRestriction"
+            })
+    }
+    if (!req.body.publicationDate || !req.body.publicationDate.match(dateRegex)) {
+        apiErrorResult.errorsMessages.push(
+            {
+                message: "Please type correct publication date",
+                field: "publicationDate"
+            })
+    }
+    if (apiErrorResult.errorsMessages.length > 0) {
+        res.status(400).send(apiErrorResult);
+        return;
+    }
+
+    // Обработка
     let video = videos.find(el => el.id === +req.params.id);
     if (video) {
-        const apiErrorResult: { errorsMessages: Array<object> } = {
-            errorsMessages: []
-        }
-        if (!req.body.title || !(req.body.title.length < 41) || !(typeof (req.body.title) === 'string')) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "Please type correct title",
-                    field: "title"
-                })
-        }
-        if (!req.body.author || !(req.body.author.length < 21)) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "Please type correct author",
-                    field: "author"
-                })
-        }
-        if (!contains(resolutions, req.body.availableResolutions)) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "Resolutions should be in (P144, P240, P360, P480, P720, P1080, P1440, P2160)",
-                    field: "availableResolutions"
-                })
-        }
-        if (!(typeof (req.body.canBeDownloaded) === "boolean")) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "A field 'canBeDownloaded' should be boolean value",
-                    field: "canBeDownloaded"
-                })
-        }
-        if (!(+req.body.minAgeRestriction < 19 && +req.body.minAgeRestriction > 0)) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "Restriction age should be in [1, 18]",
-                    field: "minAgeRestriction"
-                })
-        }
-        if (!req.body.publicationDate) {
-            apiErrorResult.errorsMessages.push(
-                {
-                    message: "Please type correct publication date",
-                    field: "publicationDate"
-                })
-        }
-        if (apiErrorResult.errorsMessages.length > 0) {
-            res.status(400).send(JSON.stringify(apiErrorResult));
-            return;
-        } else {
-            video.title = req.body.title;
-            video.author = req.body.author;
-            video.availableResolutions = req.body.availableResolutions;
-            video.canBeDownloaded = req.body.canBeDownloaded;
-            video.minAgeRestriction = +req.body.minAgeRestriction;
-            video.publicationDate = req.body.publicationDate;
-            res.sendStatus(204);
-        }
+        video.title = req.body.title;
+        video.author = req.body.author;
+        video.availableResolutions = req.body.availableResolutions;
+        video.canBeDownloaded = !!req.body.canBeDownloaded;
+        video.minAgeRestriction = +req.body.minAgeRestriction;
+        video.publicationDate = req.body.publicationDate;
+        res.sendStatus(204);
     } else {
         res.sendStatus(404);
     }
@@ -130,20 +133,20 @@ videoRouter.post('/', (req: Request, res: Response) => {
             })
     }
     if (apiErrorResult.errorsMessages.length > 0) {
-        res.status(400).send(JSON.stringify(apiErrorResult));
+        res.status(400).send(apiErrorResult);
         return;
     } else {
-        let date = new Date()
-        let date1 = new Date()
-        date1.setDate(date.getDate() + 1)
+        let dateForId = new Date()
+        let dateForCreatedAt = new Date()
+        dateForCreatedAt.setDate(dateForCreatedAt.getDate() + 1)
         const newVideo: Video = {
-            id: +date,
+            id: +dateForId,
             title: req.body.title,
             author: req.body.author,
             canBeDownloaded: false,
             minAgeRestriction: null,
-            createdAt: date.toISOString(),
-            publicationDate: date1.toISOString(),
+            createdAt: dateForId.toISOString(),
+            publicationDate: dateForCreatedAt.toISOString(),
             availableResolutions: req.body.availableResolutions
         }
         videos.push(newVideo);
