@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 const parserMiddleWare = bodyParser();
 
 app.get('/', (req:Request, res:Response) => {
-    res.send('Hello World!')
+    res.send('Hello World!!')
 })
 
 // Middleware
