@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import bodyParser from "body-parser";
 import {videoRouter} from "./router/video-router";
 
@@ -10,7 +10,11 @@ const parserMiddleWare = bodyParser();
 app.use(parserMiddleWare); // -- bodyParser
 app.use('/videos', videoRouter); // -- Routing
 
-// app.delete('/testing/..')
+// Testing delete all data
+app.delete('/testing/all-data', (req:Request, res:Response) => {
+    res.sendStatus(204);
+})
+
 app.listen(port, () => {
     console.log(`App started at ${port} port!`)
 })

@@ -11,7 +11,7 @@ type Video = {
     publicationDate: string, // $date-time, default value
     availableResolutions: Array<string>
 } // переделать на классах?
-const resolutions: Array<string> = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"]; // нужен ли enum, и, если да, то как проходить валидцию?
+const resolutions: Array<string> = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
 const videos: Array<Video> = [];
 
 // Routing
@@ -34,7 +34,7 @@ videoRouter.get('/:id', (req: Request, res: Response) => {
     if (video) {
         res.status(200).send(video);
     } else {
-        res.status(404); // Надо ли вставлять send?
+        res.sendStatus(404);
     }
 
 });
@@ -78,7 +78,7 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
             apiErrorResult.errorsMessages.field = "publicationDate";
             res.status(400).send(apiErrorResult);
             return;
-        } else { // Можно ли применить деструктуризацию?
+        } else {
             video.title = req.body.title;
             video.author = req.body.author;
             video.availableResolutions = req.body.availableResolutions;
@@ -115,14 +115,15 @@ videoRouter.post('/', (req: Request, res: Response) => {
         res.status(400).send(apiErrorResult);
         return;
     } else {
+        let date = new Date()
         const newVideo: Video = {
-            id: +new Date(),
+            id: +date,
             title: req.body.title,
             author: req.body.author,
-            canBeDownloaded: false, // default value
-            minAgeRestriction: null, // default value
-            createdAt: new Date().toISOString(), // $date-time
-            publicationDate: new Date().toISOString(), // $date-time, default value +1 from createdAt
+            canBeDownloaded: false,
+            minAgeRestriction: null,
+            createdAt: date.toISOString(),
+            publicationDate: date.setDate(date.getDate() + 1).toString(),
             availableResolutions: req.body.availableResolutions
         }
         videos.push(newVideo);
