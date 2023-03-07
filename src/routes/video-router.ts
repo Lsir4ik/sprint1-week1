@@ -66,6 +66,7 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
                 field: "availableResolutions"
             })
     }
+    // TODO нужно ли проверять?
     if (!req.body.canBeDownloaded || !(typeof (req.body.canBeDownloaded) === "boolean")) {
         apiErrorResult.errorsMessages.push(
             {
@@ -80,7 +81,8 @@ videoRouter.put('/:id', (req: Request, res: Response) => {
                 field: "minAgeRestriction"
             })
     }
-    if (!req.body.publicationDate || !req.body.publicationDate.match(dateRegex)) {
+    // TODO как проверять дату
+    if (!req.body.publicationDate || !dateRegex.test(req.body.publicationDate)) {
         apiErrorResult.errorsMessages.push(
             {
                 message: "Please type correct publication date",
@@ -133,7 +135,7 @@ videoRouter.post('/', (req: Request, res: Response) => {
             })
     }
     if (apiErrorResult.errorsMessages.length > 0) {
-        res.status(400).send(JSON.stringify(apiErrorResult));
+        res.status(400).send(apiErrorResult);
         return;
     } else {
         let dateForId = new Date()
@@ -160,8 +162,7 @@ videoRouter.delete('/:id', (req: Request, res: Response) => {
             videos.splice(i, 1);
             res.sendStatus(204);
             return;
-        } else {
-            res.sendStatus(404);
         }
     }
+    res.sendStatus(404);
 })
